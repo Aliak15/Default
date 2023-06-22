@@ -1,8 +1,8 @@
 ![](https://xzfile.aliyuncs.com/media/upload/picture/20230623063842-8a65274a-114d-1.png) 讲这个思路之前我要先说一下SQL注入的原理
 
- 				前端黑客发现输入点(username,password,cookie,token,agent，HTTP头信息等等)，输入字符串（ASCII码流）后端接收字符串（ASCII码流），然后和自己代码里的select等字符串（在传给MySQL时也是ASCII码流）进行拼接，执行SQL语句，MySQL执行语句的时候无法区分哪些是程序员写的，哪些是黑客写的，所以这是问题根源
+ 				前端黑客发现输入点(username,密码,cookie,token,agent，HTTP头信息等等)，输入字符串（ASCII码流）后端接收字符串（ASCII码流），然后和自己代码里的select等字符串（在传给MySQL时也是ASCII码流）进行拼接，执行SQL语句，MySQL执行语句的时候无法区分哪些是程序员写的，哪些是黑客写的，所以这是问题根源
  	
- 				还有一点，SQL数据库会自动解析0x开头的比如（0x2CA335434长度不限直到非0-F的字节）对应的ASCII码流解析成字符串，次操作只进行一次，就算解析后的字符串长成这个样子 (admin' and 1=2 #),SQL 引擎也不会把他当成控制字符了，就是单纯的字符串，用汇编的说法就是这个数据在DS段，不在CS段了
+ 				还有一点，SQL数据库会自动解析0x开头的比如（0x2CA335434长度不限直到非0-F的字节）对应的ASCII码流解析成字符串，次操作只进行一次，就算解析后的字符串长成这个样子 (admin' 和 1=2 #),SQL 引擎也不会把他当成控制字符了，就是单纯的字符串，用汇编的说法就是这个数据在DS段，不在CS段了
 
 因此sqlwaf的代码实现如下：
 
@@ -16,7 +16,7 @@ SQL-WAF
     $a='sad'时;
 var_dump(bin2hex($a));	//	结果是 string(6) "736164"
 因此
-当 $a=$_GET/POST['uername或password或cookie或token等']时,
+当 $a=$_GET/POST['uername或密码或cookie或token等']时,
 function sqlwaf($xx){
     $xx = bin2hex($xx);
     return '0x'.$xx;
